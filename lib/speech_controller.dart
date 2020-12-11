@@ -36,8 +36,8 @@ class _SpeechControllerState extends State<SpeechController> {
   @override
   void initState() {
     super.initState();
-    volume = 0.8; // max 1.0
-    pitch = 0.5; // max 2.0
+    volume = 1.0; // max 1.0
+    pitch = 1.0; // max 2.0
     rate = 0.5; //
     initTts();
   }
