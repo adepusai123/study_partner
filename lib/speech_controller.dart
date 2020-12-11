@@ -17,8 +17,8 @@ class _SpeechControllerState extends State<SpeechController> {
   FlutterTts flutterTts;
   dynamic languages;
   String language;
-  double volume = 0.8; // max 1.0
-  double pitch = 0.5; // max 2.0
+  double volume = 1.0; // max 1.0
+  double pitch = 1.0; // max 2.0
   double rate = 0.5; // max 1.0
   String textValue;
   TtsState ttsState = TtsState.stopped;
