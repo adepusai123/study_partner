@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 enum TtsState { playing, stopped, paused, continued }
@@ -14,6 +15,8 @@ class SpeechController extends StatefulWidget {
 }
 
 class _SpeechControllerState extends State<SpeechController> {
+  int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
+
   FlutterTts flutterTts;
   dynamic languages;
   String language;
@@ -120,6 +123,24 @@ class _SpeechControllerState extends State<SpeechController> {
 
   TextEditingController _controller = new TextEditingController();
 
+  Future<Null> _read() async {
+    List<OcrText> texts = [];
+    try {
+      texts = await FlutterMobileVision.read(
+        camera: _ocrCamera,
+        waitTap: true,
+      );
+      setState(() {
+        _controller.text = '';
+        for (int i = 0; i < texts.length; i++) {
+          _controller.text += texts[i].value;
+        }
+      });
+    } on Exception {
+      texts.add(OcrText('Failed to recognize text'));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -128,9 +149,7 @@ class _SpeechControllerState extends State<SpeechController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             InkWell(
-              onTap: () {
-                // open camera
-              },
+              onTap: () => _read,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
