@@ -38,7 +38,7 @@ class _SpeechControllerState extends State<SpeechController> {
     super.initState();
     volume = 1.0; // max 1.0
     pitch = 1.0; // max 2.0
-    rate = 0.5; //
+    rate = 0.8; //
     initTts();
   }
 
@@ -118,16 +118,51 @@ class _SpeechControllerState extends State<SpeechController> {
     flutterTts.stop();
   }
 
+  TextEditingController _controller = new TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            InkWell(
+              onTap: () {
+                // open camera
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.camera,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _controller.clear();
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.clear,
+                  color: Colors.white,
+                ),
+              ),
+            )
+          ],
+        ),
         Container(
           height: 300,
           child: TextField(
+            controller: _controller,
             decoration: InputDecoration(
               hintText: "Enter text here",
               border: InputBorder.none,
+              filled: true,
             ),
             maxLines: 1000,
             onChanged: (String value) {
@@ -147,9 +182,9 @@ class _SpeechControllerState extends State<SpeechController> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            buildAudioActions(Icons.play_arrow,
-                isPlaying ? Colors.yellow : Colors.green, _speak),
-            buildAudioActions(Icons.stop, Colors.red, _stop),
+            isPlaying
+                ? buildAudioActions(Icons.stop, Colors.red, _stop)
+                : buildAudioActions(Icons.play_arrow, Colors.green, _speak),
             buildAudioActions(
                 Icons.equalizer, showEqualize ? Colors.yellow : Colors.white,
                 () {
