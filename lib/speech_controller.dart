@@ -148,8 +148,8 @@ class _SpeechControllerState extends State<SpeechController> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            InkWell(
-              onTap: () => _read,
+            GestureDetector(
+              onTap: () => _read(),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
