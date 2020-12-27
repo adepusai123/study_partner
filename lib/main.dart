@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:study_partner/speech_controller.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 // import 'ocr_screen.dart';
 
 void main() {
@@ -32,7 +33,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String textValue;
-
+  @override
+  void initState(){
+    super.initState();
+    DefaultCacheManager().emptyCache();
+  }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
