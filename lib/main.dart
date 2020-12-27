@@ -38,66 +38,18 @@ class _HomeScreenState extends State<HomeScreen> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xff514B4B),
+        backgroundColor: Colors.white,
+        title:Text("Study Partner",style:TextStyle(color:Colors.black)),
+        centerTitle:true
       ),
       body: Container(
         height: size.height,
-        color: Color(0xff514B4B),
+        color: Color(0xffF6F6F6),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(
-                height: size.height * .09,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                    'Study Partner',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              // Container(
-              //   height: size.height * 0.5,
-              //   margin:
-              //       EdgeInsets.only(top: 25, left: 25, right: 25, bottom: 10),
-              //   decoration: BoxDecoration(
-              //     color: Colors.white,
-              //     borderRadius: BorderRadius.circular(8),
-              //   ),
-              //   child: TextField(
-              //     onChanged: (String value) {
-              //       _onChange(value);
-              //     },
-              //     decoration: InputDecoration(
-              //       hintText: "Tap to Enter text or use Camera",
-              //     ),
-              //     maxLines: 1000,
-              //   ),
-              // ),
-              // InkWell(
-              //   onTap: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: (context) {
-              //           // return Container();
-              //           return OcrScreen();
-              //         },
-              //       ),
-              //     );
-              //   },
-              //   child: Icon(
-              //     Icons.camera,
-              //     size: 36,
-              //     color: Colors.white,
-              //   ),
-              // ),
               Container(
-                margin: EdgeInsets.all(25),
+                margin: EdgeInsets.symmetric(horizontal:5, vertical:15),
                 decoration: BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(8),

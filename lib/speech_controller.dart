@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:pdf_text/pdf_text.dart';
 import 'package:file_picker/file_picker.dart';
@@ -20,10 +19,9 @@ class SpeechController extends StatefulWidget {
 }
 
 class _SpeechControllerState extends State<SpeechController> {
-  int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
   PDFDoc _pdfDoc;
-  bool _buttonsEnabled = false;
-  String _text;
+  int currentPage = 1;
+  int totalPages;
 
   FlutterTts flutterTts;
   dynamic languages;
@@ -131,41 +129,13 @@ class _SpeechControllerState extends State<SpeechController> {
 
   TextEditingController _controller = new TextEditingController();
 
-  Future<Null> _read() async {
-    List<OcrText> texts = [];
-    try {
-      texts = await FlutterMobileVision.read(
-        camera: _ocrCamera,
-        waitTap: true,
-      );
-      setState(() {
-        _controller.text = '';
-        for (int i = 0; i < texts.length; i++) {
-          _controller.text += texts[i].value;
-        }
-      });
-    } on Exception {
-      texts.add(OcrText('Failed to recognize text'));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            GestureDetector(
-              onTap: () => _read(),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.camera,
-                  color: Colors.white,
-                ),
-              ),
-            ),
             InkWell(
               onTap: () {
                 setState(() {
@@ -349,15 +319,41 @@ class _SpeechControllerState extends State<SpeechController> {
             : SizedBox(
                 height: 10,
               ),
-        FlatButton(
-          child: Text(
-            "Pick PDF document",
-            style: TextStyle(color: Colors.white),
-          ),
-          color: Colors.blueAccent,
-          onPressed: _pickPDFText,
-          padding: EdgeInsets.all(5),
-        ),
+              Row(  
+                mainAxisAlignment: MainAxisAlignment.center,
+                children:[
+                  buildAudioActions(
+                  Icons.arrow_left,
+                    currentPage != 1 ? Colors.white : Colors.black,
+                    (){
+                      if(currentPage > 1) {
+                        _readRandomPage(currentPage - 1);
+                      } else {
+                        print('This intial Page');
+                      }
+                    }
+                  ),
+                  FlatButton(
+                    child: Text(
+                      "Pick PDF",
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    color: Colors.white,
+                    onPressed: _pickPDFText,
+                    padding: EdgeInsets.all(5),
+                  ),
+                   buildAudioActions(
+                  Icons.arrow_right,
+                    currentPage != totalPages ? Colors.white : Colors.black,
+                    (){
+                      if(totalPages > currentPage){
+                        _readRandomPage(currentPage + 1);
+                      } else {
+                        print('No Pages available');
+                      }
+                    }
+                  ),
+              ],),
       ],
     );
   }
@@ -374,29 +370,29 @@ class _SpeechControllerState extends State<SpeechController> {
 
   /// Picks a new PDF document from the device
   Future _pickPDFText() async {
-    FilePickerResult result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      File file = File(result.files.single.path);
+    File file = await FilePicker.getFile();
       _pdfDoc = await PDFDoc.fromFile(file);
-      setState(() {});
-    }
+    _controller.text = '';
+      textValue = await _pdfDoc.text;
+      _readRandomPage(1);
+      setState(() {
+        totalPages =_pdfDoc.length;
+        //  _controller.text =textValue;
+      });
   }
 
   /// Reads a random page of the document
-  Future _readRandomPage() async {
+  Future _readRandomPage(int page) async {
     if (_pdfDoc == null) {
       return;
     }
-    setState(() {
-      _buttonsEnabled = false;
-    });
 
     String text =
-        await _pdfDoc.pageAt(Random().nextInt(_pdfDoc.length) + 1).text;
+        await _pdfDoc.pageAt(page).text;
 
     setState(() {
-      _text = text;
-      _buttonsEnabled = true;
+     _controller.text =text;
+      currentPage = page;
     });
   }
 
@@ -405,15 +401,10 @@ class _SpeechControllerState extends State<SpeechController> {
     if (_pdfDoc == null) {
       return;
     }
-    setState(() {
-      _buttonsEnabled = false;
-    });
-
     String text = await _pdfDoc.text;
 
     setState(() {
-      _text = text;
-      _buttonsEnabled = true;
+     _controller.text = text;
     });
   }
 }
