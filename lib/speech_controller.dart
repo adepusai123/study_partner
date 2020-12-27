@@ -1,6 +1,11 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:pdf_text/pdf_text.dart';
+import 'package:file_picker/file_picker.dart';
 
 enum TtsState { playing, stopped, paused, continued }
 
@@ -16,6 +21,9 @@ class SpeechController extends StatefulWidget {
 
 class _SpeechControllerState extends State<SpeechController> {
   int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
+  PDFDoc _pdfDoc;
+  bool _buttonsEnabled = false;
+  String _text;
 
   FlutterTts flutterTts;
   dynamic languages;
@@ -341,6 +349,15 @@ class _SpeechControllerState extends State<SpeechController> {
             : SizedBox(
                 height: 10,
               ),
+        FlatButton(
+          child: Text(
+            "Pick PDF document",
+            style: TextStyle(color: Colors.white),
+          ),
+          color: Colors.blueAccent,
+          onPressed: _pickPDFText,
+          padding: EdgeInsets.all(5),
+        ),
       ],
     );
   }
@@ -353,5 +370,50 @@ class _SpeechControllerState extends State<SpeechController> {
       splashColor: Colors.green,
       onPressed: () => onTap(),
     );
+  }
+
+  /// Picks a new PDF document from the device
+  Future _pickPDFText() async {
+    FilePickerResult result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      File file = File(result.files.single.path);
+      _pdfDoc = await PDFDoc.fromFile(file);
+      setState(() {});
+    }
+  }
+
+  /// Reads a random page of the document
+  Future _readRandomPage() async {
+    if (_pdfDoc == null) {
+      return;
+    }
+    setState(() {
+      _buttonsEnabled = false;
+    });
+
+    String text =
+        await _pdfDoc.pageAt(Random().nextInt(_pdfDoc.length) + 1).text;
+
+    setState(() {
+      _text = text;
+      _buttonsEnabled = true;
+    });
+  }
+
+  /// Reads the whole document
+  Future _readWholeDoc() async {
+    if (_pdfDoc == null) {
+      return;
+    }
+    setState(() {
+      _buttonsEnabled = false;
+    });
+
+    String text = await _pdfDoc.text;
+
+    setState(() {
+      _text = text;
+      _buttonsEnabled = true;
+    });
   }
 }
